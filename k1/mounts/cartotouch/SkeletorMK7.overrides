@@ -1,0 +1,46 @@
+# https://www.printables.com/model/961152-skeletor-mk6-a-creality-k1k1-maxk1c-toolhead-cover
+
+-- cartotouch.cfg
+[scanner]
+x_offset:
+y_offset:
+
+-- cartographer-k1.cfg
+[bed_mesh]
+mesh_min:
+mesh_max:
+
+[screws_tilt_adjust]
+screw1:
+screw2:
+screw3:
+screw4:
+
+-- cartographer-k1m.cfg
+[bed_mesh]
+mesh_min:
+mesh_max:
+
+[screws_tilt_adjust]
+screw1:
+screw2:
+screw3:
+screw4:
+
+-- printer-k1.cfg
+[stepper_y]
+position_max:
+position_min:
+
+[stepper_x]
+position_max:
+position_min:
+
+-- printer-k1m.cfg
+[stepper_y]
+position_max:
+position_min:
+
+[stepper_x]
+position_max:
+position_min:
