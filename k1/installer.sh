@@ -473,6 +473,9 @@ install_fluidd() {
         $CONFIG_HELPER --remove-section "display_status" || exit $?
         $CONFIG_HELPER --remove-section "virtual_sdcard" || exit $?
 
+        # run _ON_FILAMENT_RUNOUT when filament runout detected
+        $CONFIG_HELPER --replace-section-entry "filament_switch_sensor filament_sensor" "runout_gcode" "_ON_FILAMENT_RUNOUT" || exit $?
+
         $CONFIG_HELPER --add-include "fluidd.cfg" || exit $?
 
         echo "fluidd" >> /usr/data/pellcorp.done
