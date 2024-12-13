@@ -356,6 +356,8 @@ install_moonraker() {
         fi
 
         ln -sf /usr/data/pellcorp/k1/tools/supervisorctl /usr/bin/ || exit $?
+        ln -sf /usr/data/pellcorp/k1/tools/systemctl /usr/bin/ || exit $?
+        ln -sf /usr/data/pellcorp/k1/tools/sudo /usr/bin/ || exit $?
         cp /usr/data/pellcorp/k1/services/S56moonraker_service /etc/init.d/ || exit $?
         cp /usr/data/pellcorp/k1/moonraker.conf /usr/data/printer_data/config/ || exit $?
         ln -sf /usr/data/pellcorp/k1/moonraker.asvc /usr/data/printer_data/ || exit $?
@@ -473,6 +475,8 @@ install_fluidd() {
         $CONFIG_HELPER --remove-section "display_status" || exit $?
         $CONFIG_HELPER --remove-section "virtual_sdcard" || exit $?
 
+        $CONFIG_HELPER --replace-section-entry "filament_switch_sensor filament_sensor" "runout_gcode" "_ON_FILAMENT_RUNOUT" || exit $?
+
         $CONFIG_HELPER --add-include "fluidd.cfg" || exit $?
 
         echo "fluidd" >> /usr/data/pellcorp.done
@@ -553,6 +557,10 @@ install_kamp() {
 
         # SMART_PARK
         sed -i 's:#\[include ./KAMP/Smart_Park.cfg\]:\[include ./KAMP/Smart_Park.cfg\]:g' /usr/data/printer_data/config/KAMP_Settings.cfg
+
+        # lower and longer purge line
+        $CONFIG_HELPER --file KAMP_Settings.cfg --replace-section-entry "gcode_macro _KAMP_Settings" variable_purge_height 0.5
+        $CONFIG_HELPER --file KAMP_Settings.cfg --replace-section-entry "gcode_macro _KAMP_Settings" variable_purge_amount 48
 
         cp /usr/data/printer_data/config/KAMP_Settings.cfg /usr/data/pellcorp-backups/
 
@@ -1015,10 +1023,18 @@ setup_cartotouch() {
         $CONFIG_HELPER --remove-section "scanner" || exit $?
         $CONFIG_HELPER --add-section "scanner" || exit $?
 
-        if grep -q "#*# [scanner]" /usr/data/pellcorp-overrides/printer.cfg.save_config 2> /dev/null; then
-          $CONFIG_HELPER --replace-section-entry "scanner" "#scanner_touch_z_offset" "0.05" || exit $?
+        scanner_touch_z_offset=$($CONFIG_HELPER --ignore-missing --file /usr/data/pellcorp-overrides/printer.cfg.save_config --get-section-entry scanner scanner_touch_z_offset)
+        if [ -n "$scanner_touch_z_offset" ]; then
+          $CONFIG_HELPER --replace-section-entry "scanner" "# scanner_touch_z_offset" "0.05" || exit $?
         else
           $CONFIG_HELPER --replace-section-entry "scanner" "scanner_touch_z_offset" "0.05" || exit $?
+        fi
+
+        scanner_mode=$($CONFIG_HELPER --ignore-missing --file /usr/data/pellcorp-overrides/printer.cfg.save_config --get-section-entry scanner mode)
+        if [ -n "$scanner_mode" ]; then
+            $CONFIG_HELPER --replace-section-entry "scanner" "# mode" "touch" || exit $?
+        else
+            $CONFIG_HELPER --replace-section-entry "scanner" "mode" "touch" || exit $?
         fi
 
         cp /usr/data/pellcorp/k1/cartographer-${model}.cfg /usr/data/printer_data/config/ || exit $?
@@ -1073,8 +1089,9 @@ setup_beacon() {
         $CONFIG_HELPER --remove-section "beacon" || exit $?
         $CONFIG_HELPER --add-section "beacon" || exit $?
 
-        if grep -q "#*# [beacon]" /usr/data/pellcorp-overrides/printer.cfg.save_config 2> /dev/null; then
-          $CONFIG_HELPER --replace-section-entry "beacon" "#cal_nozzle_z" "0.1" || exit $?
+        beacon_cal_nozzle_z=$($CONFIG_HELPER --ignore-missing --file /usr/data/pellcorp-overrides/printer.cfg.save_config --get-section-entry beacon cal_nozzle_z)
+        if [ -n "$beacon_cal_nozzle_z" ]; then
+          $CONFIG_HELPER --replace-section-entry "beacon" "# cal_nozzle_z" "0.1" || exit $?
         else
           $CONFIG_HELPER --replace-section-entry "beacon" "cal_nozzle_z" "0.1" || exit $?
         fi
