@@ -4,13 +4,14 @@
 # https://github.com/pyscaffold/configupdater
 #
 
-import io, os
+import io
+import os
 from configupdater import ConfigUpdater
 import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Pellcorp Config Overrides')
+    parser = argparse.ArgumentParser(description='Crumflight Config Overrides')
     parser.add_argument("-o", "--original", type=str, required=True)
     parser.add_argument("-u", "--updated", type=str, required=True)
     parser.add_argument("-v", "--overrides", type=str, required=True)
@@ -19,18 +20,21 @@ def main():
     if not os.path.exists(args.original):
         raise Exception(f"Config File {args.original} not found")
     if not os.path.exists(args.updated):
-       raise Exception(f"Config File {args.updated} not found")
+        raise Exception(f"Config File {args.updated} not found")
 
-    original = ConfigUpdater(strict=False, allow_no_value=True, space_around_delimiters=False, delimiters=(":", "="))
+    original = ConfigUpdater(strict=False, allow_no_value=True,
+                             space_around_delimiters=False, delimiters=(":", "="))
     with open(args.original, 'r') as file:
         original.read_file(file)
-    
-    updated = ConfigUpdater(strict=False, allow_no_value=True, space_around_delimiters=False, delimiters=(":", "="))
+
+    updated = ConfigUpdater(strict=False, allow_no_value=True,
+                            space_around_delimiters=False, delimiters=(":", "="))
     with open(args.updated, 'r') as file:
         updated.read_file(file)
 
-    overrides = ConfigUpdater(strict=False, allow_no_value=True, space_around_delimiters=False, delimiters=(":", "="))
-    
+    overrides = ConfigUpdater(strict=False, allow_no_value=True,
+                              space_around_delimiters=False, delimiters=(":", "="))
+
     update_overrides = False
     printer_cfg = 'printer.cfg' == os.path.basename(args.original)
     moonraker_conf = 'moonraker.conf' == os.path.basename(args.original)
@@ -40,7 +44,8 @@ def main():
     for section_name in original.sections():
         if section_name not in updated.sections() and (printer_cfg or fan_control):
             if len(overrides.sections()) > 0:
-                overrides[overrides.sections()[-1]].add_after.space().section(section_name)
+                overrides[overrides.sections()[-1]
+                          ].add_after.space().section(section_name)
             else:
                 overrides.add_section(section_name)
             overrides[section_name]['__action__'] = ' DELETED'
@@ -53,7 +58,8 @@ def main():
             if section_name not in original.sections():
                 new_section = updated.get_section(section_name, None)
                 if len(overrides.sections()) > 0:
-                    overrides[overrides.sections()[-1]].add_after.space().section(section_name)
+                    overrides[overrides.sections()[-1]
+                              ].add_after.space().section(section_name)
                 else:
                     overrides.add_section(section_name)
 
@@ -63,7 +69,8 @@ def main():
                         lines = value.lines
                         lines[0] = '\n'
                         overrides[section_name][key] = ''
-                        overrides[section_name][key].set_values(lines, indent='', separator='')
+                        overrides[section_name][key].set_values(
+                            lines, indent='', separator='')
                     else:
                         overrides[section_name][key] = f' {value.value.strip()}'
                 update_overrides = True
@@ -77,7 +84,8 @@ def main():
                 if key not in updated_section and printer_cfg:
                     if not overrides.has_section(section_name):
                         if len(overrides.sections()) > 0:
-                            overrides[overrides.sections()[-1]].add_after.space().section(section_name)
+                            overrides[overrides.sections()[-1]
+                                      ].add_after.space().section(section_name)
                         else:
                             overrides.add_section(section_name)
                     overrides[section_name][key] = ' __DELETED__'
@@ -113,7 +121,8 @@ def main():
                     if (not original_value and updated_value and updated_value.value) or (original_value and original_value.value and updated_value and updated_value.value and original_value.value != updated_value.value):
                         if not overrides.has_section(section_name):
                             if len(overrides.sections()) > 0:
-                                overrides[overrides.sections()[-1]].add_after.space().section(section_name)
+                                overrides[overrides.sections(
+                                )[-1]].add_after.space().section(section_name)
                             else:
                                 overrides.add_section(section_name)
 
@@ -122,7 +131,8 @@ def main():
                             lines = updated_value.lines
                             lines[0] = '\n'
                             overrides[section_name][key] = ''
-                            overrides[section_name][key].set_values(lines, indent='', separator='')
+                            overrides[section_name][key].set_values(
+                                lines, indent='', separator='')
                         else:
                             overrides[section_name][key] = f' {updated_value.value.strip()}'
                         update_overrides = True
@@ -131,7 +141,7 @@ def main():
         print(f"INFO: Saving overrides to {args.overrides} ...")
         with open(args.overrides, 'w') as file:
             overrides.write(file)
-            
+
 
 if __name__ == '__main__':
     main()

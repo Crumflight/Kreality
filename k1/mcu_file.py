@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 #
-# This is a simple utility to enable some very basic validation of the 
-# /usr/data/pellcorp/k1/fw/K1 files to make sure they include the 
+# This is a simple utility to enable some very basic validation of the
+# /usr/data/Crumflight/k1/fw/K1 files to make sure they include the
 # K1_Series_Klipper Version header and CRC16, which on some MCU
 # can cause a soft brick which is very inconvenient.
 #
@@ -20,7 +20,7 @@ def get_file_metadata(args):
         return {}
     try:
         with file.open('rb') as rfile:
-            rfile.seek(0x200)    
+            rfile.seek(0x200)
             bytes = rfile.read(12)
             version_header = f"{str(bytes.decode('utf-8'))}"
             type = version_header[:4]
@@ -47,10 +47,12 @@ def get_file_metadata(args):
         return None
 
 
-parser = argparse.ArgumentParser(description='Creality K1 MCU Firmware File Metadata')
+parser = argparse.ArgumentParser(
+    description='Creality K1 MCU Firmware File Metadata')
 parser.add_argument('-f', '--file', type=str, help='firmware file')
 parser.add_argument('-v', '--version', action='store_true', help='Get Version')
-parser.add_argument('-x', '--header', action='store_true', help='Get Version Header')
+parser.add_argument('-x', '--header', action='store_true',
+                    help='Get Version Header')
 parser.add_argument('-t', '--type', action='store_true', help='Get MCU Type')
 parser.add_argument('-c', '--crc16', action='store_true', help='Get CRC16')
 parser.add_argument('-l', '--length', action='store_true', help='Get Length')
