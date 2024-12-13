@@ -1,10 +1,10 @@
 from ubuntu:focal
 
-# 
-# docker build . -t pellcorp/k1-klipper-fw-build
-# docker login
-# docker push pellcorp/k1-klipper-fw-build
-#
+
+docker build . -t Crumflight/k1-klipper-fw-build
+docker login
+docker push Crumflight/k1-klipper-fw-build
+
 
 ADD 2004-sources.list /etc/apt/sources.list
 
